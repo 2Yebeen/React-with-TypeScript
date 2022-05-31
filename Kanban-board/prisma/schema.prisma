@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,128 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model board {
+  id            Int             @id(map: "board_pk") @default(autoincrement())
+  workspace_id  Int
+  title         String          @db.VarChar
+  visibility    Boolean         @default(true)
+  created_at    DateTime        @default(now()) @db.Date
+  workspace     workspace       @relation(fields: [workspace_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "board_workspace_id_fk")
+  board_history board_history[]
+  list          list[]
+}
+
+model board_history {
+  id          Int      @id(map: "board_history_pk") @default(autoincrement())
+  board_id    Int
+  description String?  @db.VarChar
+  updated_by  Int
+  updated_at  DateTime @default(now()) @db.Date
+  board       board    @relation(fields: [board_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "board_history_board_id_fk")
+  user        user     @relation(fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "board_history_user_id_fk")
+}
+
+model card {
+  id           Int            @id(map: "card_pk") @default(autoincrement())
+  list_id      Int
+  title        String         @db.VarChar
+  description  String?        @db.VarChar
+  due_date     DateTime?      @db.Date
+  position     Int?
+  status       Boolean        @default(false)
+  created_at   DateTime       @default(now()) @db.Date
+  list         list           @relation(fields: [list_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "card_list_id_fk")
+  card_history card_history[]
+}
+
+model card_history {
+  id          Int      @id(map: "card_history_pk") @default(autoincrement())
+  card_id     Int
+  description String?  @db.VarChar
+  updated_by  Int
+  updated_at  DateTime @default(now()) @db.Date
+  card        card     @relation(fields: [card_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "card_history_card_id_fk")
+  user        user     @relation(fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "card_history_user_id_fk")
+}
+
+model link {
+  id           Int       @id(map: "link_pk") @default(autoincrement())
+  workspace_id Int
+  link         String    @db.VarChar
+  created_at   DateTime? @default(now()) @db.Date
+  updated_at   DateTime? @default(now()) @db.Date
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "link_workspace_id_fk")
+}
+
+model list {
+  id           Int            @id(map: "list_pk") @default(autoincrement())
+  board_id     Int
+  title        String         @db.VarChar
+  position     Int?
+  created_at   DateTime       @default(now()) @db.Date
+  board        board          @relation(fields: [board_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "list_board_id_fk")
+  card         card[]
+  list_history list_history[]
+}
+
+model list_history {
+  id          Int       @id(map: "list_history_pk") @default(autoincrement())
+  list_id     Int
+  description String?   @db.VarChar
+  updated_by  Int
+  updated_at  DateTime? @default(now()) @db.Date
+  list        list      @relation(fields: [list_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "list_history_list_id_fk")
+  user        user      @relation(fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "list_history_user_id_fk")
+}
+
+model member {
+  id           Int       @id(map: "member_pk") @default(autoincrement())
+  user_id      Int
+  workspace_id Int
+  authority    Int?
+  created_at   DateTime  @default(now()) @db.Date
+  updated_at   DateTime  @default(now()) @db.Date
+  user         user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "member_user_id_fk")
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "member_workspace_id_fk")
+}
+
+model user {
+  id                Int                 @id(map: "user_pk") @default(autoincrement())
+  name              String?             @db.VarChar
+  email             String              @db.VarChar
+  create_at         DateTime            @default(now()) @db.Date
+  update_at         DateTime            @default(now()) @db.Date
+  board_history     board_history[]
+  card_history      card_history[]
+  list_history      list_history[]
+  member            member[]
+  workspace         workspace[]
+  workspace_history workspace_history[]
+}
+
+model workspace {
+  id                Int                 @id(map: "workspace_pk") @default(autoincrement())
+  owner_id          Int
+  title             String              @db.VarChar
+  type              String?             @db.VarChar
+  description       String?             @db.VarChar
+  visibility        Boolean             @default(true)
+  created_at        DateTime            @default(now()) @db.Date
+  user              user                @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "workspace_user_id_fk")
+  board             board[]
+  link              link[]
+  member            member[]
+  workspace_history workspace_history[]
+}
+
+model workspace_history {
+  id           Int       @id(map: "workspace_history_pk") @default(autoincrement())
+  workspace_id Int
+  description  String    @db.VarChar
+  updated_by   Int
+  updated_at   DateTime  @default(now()) @db.Date
+  user         user      @relation(fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "workspace_history_user_id_fk")
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "workspace_history_workspace_id_fk")
 }
