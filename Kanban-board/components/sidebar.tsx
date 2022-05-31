@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const Sidebar: FC = () => {
   return (
-    <div>
+    <article className="flex flex-col min-h-screen justify-center items-center bg-light text-dark dark:bg-dark dark:text-light">
       <div style={{ marginBottom: 15 }}>
         <Link href="/views/home" as="/">
           <a
@@ -13,7 +13,7 @@ const Sidebar: FC = () => {
               textTransform: 'uppercase',
             }}
           >
-            EXAMPLE APP
+            Kanban board
           </a>
         </Link>
       </div>
@@ -24,8 +24,8 @@ const Sidebar: FC = () => {
           </Link>
         </li>
         <li>
-          <Link href="/views/about" as="/about">
-            <a>About</a>
+          <Link href="/views/signin" as="/signin">
+            <a>Sign in</a>
           </Link>
         </li>
         <li>
@@ -34,7 +34,7 @@ const Sidebar: FC = () => {
           </Link>
         </li>
       </ul>
-    </div>
+    </article>
   );
 };
 

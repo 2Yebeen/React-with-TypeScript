@@ -8,9 +8,9 @@ export class AppController {
     return { name };
   }
 
-  @Render('about')
-  @Get('/about')
-  public about() {
+  @Render('signin')
+  @Get('/singin')
+  public signin() {
     return {};
   }
 }
