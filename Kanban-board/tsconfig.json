@@ -38,7 +38,7 @@
     "./src/**/*",
     "./ui/**/*",
     "types.ts"
-  ],
+, "../temp/user", "../temp/repository"  ],
   "exclude": [
     "node_modules"
   ]
