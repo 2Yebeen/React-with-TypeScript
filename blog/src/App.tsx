@@ -14,6 +14,8 @@ function App() {
   ]);
   let [modal, setModal] = useState<boolean>(false);
   let [modalTitle, setModalTitle] = useState<string>(data[0].title);
+  let [input, setInput] = useState<string>('');
+
   const clickLike = (index: number) => {
     let tmpList:Iitems[] = []
     data.forEach(
@@ -28,6 +30,11 @@ function App() {
           tmpList = tmpList.concat(tmp)
         setData(tmpList);
     });
+  }
+  const clickDelete = (index: number) => {
+    let copy = [...data];
+    copy.splice(index, 1);
+    setData(copy);
   }
   return (
     <div className="App">
@@ -49,7 +56,8 @@ function App() {
           <div className='list' key={idx}>
             <h4 onClick={() => {modalTitle === data.title ? setModal(!modal) : setModal(true); setModalTitle(data.title)}}>{ data.title }</h4>
             <span onClick={() => clickLike(idx)}> 👍 </span> { data.like } 
-            <p>9월 1일 발행</p>
+            <p>9월 2일 발행</p>
+            <button onClick={() => {clickDelete(idx); setModal(false)}}>삭제</button>
           </div>
         )
       })}
@@ -59,7 +67,17 @@ function App() {
       2. UI의 현재 상태를 state로 저장
       3. state에 따라 UI가 어떻게 보일지 작성
       */}
-      {modal ? <Modal title={modalTitle} setTitle={setData} / > : null}
+      제목 : <input onChange={(e)=>{ setInput(e.target.value) }} />
+      <button onClick={() => {
+        let copy = [...data];
+        let tmp:Iitems = {
+          like: 0,
+          title: input,
+        }
+        copy = tmp.title ? copy.concat(tmp) : copy
+        setData(copy)
+      }}>추가</button>
+      {modal ? <Modal title={modalTitle} setTitle={setData} setModal={setModal}/ > : null}
     </div>
   );
 }
@@ -73,6 +91,7 @@ function App() {
 interface ModalProps {
   title: string,
   setTitle: React.Dispatch<React.SetStateAction<Iitems[]>>,
+  setModal: React.Dispatch<React.SetStateAction<boolean>>,
 };
 
 const  Modal = (props: ModalProps) => {
@@ -85,7 +104,7 @@ const  Modal = (props: ModalProps) => {
         [{like:0, title:'react 강의 추천'}, 
         {like:0, title:'Typescript 강의 추천'}, 
         {like:0, title:'파이썬독학'}]
-       )}}>글 수정</button>
+       );  props.setModal(false);}}>글 수정</button>
     </div>
   );
 }
